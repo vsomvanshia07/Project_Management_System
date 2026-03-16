@@ -1,35 +1,58 @@
 import express from "express";
-import { 
-    createStudent,
-    deleteStudent,
-    updateSudent as updateStudent,
-}from "../controllers/admincontroller.js";
+import {
+  createStudent,
+  createTeacher,
+  deleteStudent,
+  deleteTeacher,
+  getAllUsers,
+  updateStudent,
+  updateTeacher,
+} from "../controllers/admincontroller.js";
 import multer from "multer";
-import { 
-    isAuthenticated,
-    isAuthorized,
-    
-
- } from "../middlewares/authMiddleware.js";
+import {
+  isAuthenticated,
+  isAuthorized,
+} from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 router.post(
-    "/create-student",
-    isAuthenticated,
-    isAuthorized("Admin"),
-    createStudent
+  "/create-student",
+  isAuthenticated,
+  isAuthorized("Admin"),
+  createStudent,
 );
 router.put(
-    "/update-student",
-    isAuthenticated,
-    isAuthorized("Admin"),
-    updateStudent
+  "/update-student/:id",
+  isAuthenticated,
+  isAuthorized("Admin"),
+  updateStudent,
 );
 router.delete(
-    "/delete-student",
-    isAuthenticated,
-    isAuthorized("Admin"),
-    deleteStudent
+  "/delete-student/:id",
+  isAuthenticated,
+  isAuthorized("Admin"),
+  deleteStudent,
 );
+
+router.post(
+  "/create-teacher",
+  isAuthenticated,
+  isAuthorized("Admin"),
+  createTeacher,
+);
+router.put(
+  "/update-teacher/:id",
+  isAuthenticated,
+  isAuthorized("Admin"),
+  updateTeacher,
+);
+router.delete(
+  "/delete-teacher/:id",
+  isAuthenticated,
+  isAuthorized("Admin"),
+  deleteTeacher,
+);
+
+router.get("/users", isAuthenticated, isAuthorized("Admin"), getAllUsers);
 
 export default router;
