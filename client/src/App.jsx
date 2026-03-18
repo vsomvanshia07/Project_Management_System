@@ -108,8 +108,16 @@ const App = () => {
           <Route path="projects" element={<ProjectsPage />} />
         </Route>
 
+
         {/* Student Routes */}
-        <Route path="/student" element={<DashboardLayout />}>
+        <Route
+          path="/student"
+          element={
+            <ProtectedRoute allowedRoles={["Student"]}>
+              <DashboardLayout userRole={"Student"} />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<StudentDashboard />} />
           <Route path="submit-proposal" element={<SubmitProposal />} />
           <Route path="upload-files" element={<UploadFiles />} />

@@ -2,7 +2,9 @@ import express from "express";
 import {
   getAvailableSuperVisors,
   getStudentProject,
+  getSupervisor,
   submitProposal,
+  requestSupervisor,
   uploadFiles,
 } from "../controllers/studentController.js";
 import multer from "multer";
@@ -14,7 +16,7 @@ import {
 import { handleUploadError, upload } from "../middlewares/upload.js";
 
 const router = express.Router();
-router.post(
+router.get(
   "/project",
   isAuthenticated,
   isAuthorized("Student"),
@@ -42,6 +44,20 @@ router.get(
   isAuthenticated,
   isAuthorized("Student"),
   getAvailableSuperVisors,
+);
+
+router.get(
+  "/Supervisors",
+  isAuthenticated,
+  isAuthorized("Student"),
+  getSupervisor,
+);
+
+router.post(
+  "/request-supervisor",
+  isAuthenticated,
+  isAuthorized("Student"),
+  requestSupervisor,
 );
 
 export default router;
