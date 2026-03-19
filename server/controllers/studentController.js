@@ -5,6 +5,8 @@ import * as userServices from "../services/userService.js";
 import * as projectService from "../services/projectServices.js";
 import * as requestServices from "../services/requestServices.js";
 import * as notificationServices from "../services/notificationServices.js";
+import { Project } from "../models/project.js";
+import { Notification } from "../models/notification.js";
 
 export const getStudentProject = asyncHandler(async (req, res, next) => {
   const studentId = req.user._id;
@@ -156,7 +158,7 @@ export const requestSupervisor = asyncHandler(async (req, res, next) => {
     "/teacher/requests",
     "medium",
   );
-  
+
   res.status(201).json({
     success: true,
     data: { request },
@@ -165,3 +167,49 @@ export const requestSupervisor = asyncHandler(async (req, res, next) => {
 });
 
 //suggetion: can create the requestSupervisorChange.
+
+export const getDashboardStats = asyncHandler(async (req, res, next) => {
+  const studentId = req.user._id;
+
+  const project = await Project.findOne({ student: studentId })
+    .sort({ createdAt: -1 })
+    .populate("supervisor", "name")
+    .lean();
+
+  const now = new Date();
+  const upcomingDeadlines = await Project.find({
+    student: studentId,
+    deadline: { $gte: now },
+  })
+    .select("title description")
+    .sort({ deadline: 1 })
+    .limit(3)
+    .lean();
+
+  const topNotifications = await Notification.find({ user: studentId })
+    .populate("user", "name")
+    .sort({ createdAt: -1 })
+    .limit(3)
+    .lean();
+
+  const feedbackNotifications =
+    project?.feedback && project?.feedback.length > 0
+      ? project.feedback
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 2)
+      : [];
+
+  const supervisorName = project?.supervisor?.name || null;
+
+  res.status(200).json({
+    success: true,
+    message: "Dashboard stats fetched successfully",
+    data: {
+      project,
+      upcomingDeadlines,
+      topNotifications,
+      feedbackNotifications,
+      supervisorName,
+    },
+  });
+});

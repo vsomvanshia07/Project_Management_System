@@ -51,7 +51,9 @@ export const fetchAllSupervisors = createAsyncThunk(
       const res = await axiosInstance.get("/student/fetch-supervisor");
       return res.data.data?.supervisors;
     } catch (error) {
-      toast.error(error.response.data.message || "Failed to fetch available supervisors");
+      toast.error(
+        error.response.data.message || "Failed to fetch available supervisors",
+      );
       return thunkAPI.rejectWithValue(error.response.data.message);
     }
   },
@@ -65,13 +67,37 @@ export const requestSupervisors = createAsyncThunk(
       thunkAPI.dispatch(getSupervisor());
       return res.data.data?.request;
     } catch (error) {
-      toast.error(error.response.data.message || "Failed to request supervisors");
+      toast.error(
+        error.response.data.message || "Failed to request supervisors",
+      );
       return thunkAPI.rejectWithValue(error.response.data.message);
     }
   },
 );
 
-
+export const uploadFiles = createAsyncThunk(
+  "student/uploadFiles",
+  async ({ projectId, files }, thunkAPI) => {
+    try {
+      const form = new FormData();
+      for (const file of files) form.append("files", file);
+      const res = await axiosInstance.post(
+        `/student/upload/${projectId}`,
+        form,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+      toast.success(res.data.message || "Files uploaded successfully");
+      return res.data.data.project || res.data;
+    } catch (error) {
+      toast.error(error.response.data.message || "Failed to upload files");
+      return thunkAPI.rejectWithValue(error.response.data.message);
+    }
+  },
+);
 
 const studentSlice = createSlice({
   name: "student",
@@ -94,7 +120,7 @@ const studentSlice = createSlice({
     builder.addCase(fetchProject.fulfilled, (state, action) => {
       state.project = action.payload?.project || action.payload || null;
     });
-    
+
     builder.addCase(getSupervisor.fulfilled, (state, action) => {
       state.supervisor = action.payload?.supervisor || action.payload || null;
     });
@@ -103,6 +129,10 @@ const studentSlice = createSlice({
       state.supervisors = action.payload?.supervisors || action.payload || [];
     });
 
+    builder.addCase(uploadFiles.fulfilled, (state, action) => {
+      const newFiles = action.payload?.project?.files || action.payload ||[];
+      state.files = [...state.files, ...newFiles];
+    });
   },
 });
 
