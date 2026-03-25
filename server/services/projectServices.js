@@ -33,7 +33,7 @@ export const addFilesToProject = async (projectId, files) => {
   const fileMetaData = files.map((file) => ({
     fileType: file.mimetype,
     fileUrl: file.path,
-    originalName: file.originalName,
+    originalName: file.originalname,
     uploadAt: new Date(),
   }));
 
@@ -41,4 +41,9 @@ export const addFilesToProject = async (projectId, files) => {
   await project.save();
   
   return project;
+};
+
+export const getAllProjects = async () => {
+  const projects = await Project.find();
+  return projects;
 };

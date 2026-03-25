@@ -32,10 +32,10 @@ const ManageStudents = () => {
     const studentUsers = (users || []).filter(
       (u) => u.role?.toLowerCase() === "student",
     );
-
+  //enhance students with project infromation
     return studentUsers.map((student) => {
       const studentProject = (projects || []).find(
-        (p) => p.student?._id === student._id,
+        (p) => p.student === student._id,
       );
       return {
         ...student,
@@ -270,11 +270,14 @@ const ManageStudents = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
+                    
                           {student.supervisor ? (
                             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-green-800 bg-green-100 text-xs font-medium">
-                              {typeof student.supervisor === "object"
-                                ? student.supervisor.name || "-"
-                                : student.supervisor}
+                             {
+                             users?.find(
+                              u => u._id === student?.supervisor
+                              )?.name
+                              }
                             </span>
                           ) : (
                             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-red-800 bg-red-100 text-xs font-medium">

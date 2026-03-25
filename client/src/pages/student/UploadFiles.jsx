@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { fetchProject, uploadFiles } from "../../store/slices/studentSlice";
+import { downloadFile, fetchProject, uploadFiles } from "../../store/slices/studentSlice";
 import { FileText, Archive, File, FileCode } from "lucide-react";
 
 const UploadFiles = () => {
@@ -53,6 +53,22 @@ const UploadFiles = () => {
             ? "text-orange-500"
             : "text-slate-500";
     return <Icon className={` w-8 h-8 ${color} `} />;
+  };
+
+  const handleDownloadFile = async (file) => {
+    const res= await dispatch(
+      downloadFile({ projectId: project._id, fileId: file._id})
+    ).then(res=>{
+      const { blob} = res.payload;
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download",file.name || "download");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    });
   };
 
   return (
@@ -248,7 +264,12 @@ const UploadFiles = () => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <button className="btn-outline btn-small">Download</button>
+                    <button 
+                    className="btn-outline btn-small"
+                     onClick={()=> handleDownloadFile(file)}
+                    >
+                      Download
+                     </button>
                   </div>
                 </div>
               ))}

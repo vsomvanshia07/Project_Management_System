@@ -6,6 +6,9 @@ import {
   submitProposal,
   requestSupervisor,
   uploadFiles,
+  getFeedback,
+  getDashboardStats,
+  downloadFile,
 } from "../controllers/studentController.js";
 import multer from "multer";
 import {
@@ -60,4 +63,24 @@ router.post(
   requestSupervisor,
 );
 
+
+router.get(
+  "/feedback/:projectId",
+  isAuthenticated,
+  isAuthorized("student"),
+  getFeedback
+);
+
+router.get(
+  "/fetch-dashboard-stats",
+  isAuthenticated,
+  isAuthorized("student"),
+  getDashboardStats
+);
+router.get(
+  "/download/:projectId/:fileId",
+  isAuthenticated,
+  isAuthorized("student"),
+  downloadFile
+);
 export default router;
