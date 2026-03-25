@@ -58,11 +58,22 @@ const SupervisorPage = () => {
   };
 
   const submitRequest = () => {
+    console.log(selectedSupervisor);
     if (!selectedSupervisor) return;
     const message =
       requestMessage?.trim() ||
-      `${authUser.name} is requesting ${selectedSupervisor.name} to be their supervisor.`;
-    dispatch(requestSupervisor({ teacherId: selectedSupervisor._id, message }));
+      `${authUser.name} is requesting ${
+        selectedSupervisor.name
+
+      } to be their supervisor.`;
+    dispatch(
+      requestSupervisor({ teacherId: selectedSupervisor._id, message })
+    ).then(res=>{
+      if(res.type === "student/requestSupervisor/fulfilled"){
+        setShowRequestModel(false);
+      }
+    });
+   
   };
 
   return (

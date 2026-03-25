@@ -46,7 +46,7 @@ export const deleteStudent = createAsyncThunk(
 
 export const getAllUsers = createAsyncThunk(
   "getAllUsers",
-  async (id, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await axiosInstance.get(`/admin/users`);
       return res.data.data;
@@ -99,6 +99,19 @@ export const deleteTeacher = createAsyncThunk(
   },
 );
 
+export const getAllProjects = createAsyncThunk(
+  "getAllProjects",
+  async (_, thunkAPI) => {
+    try {
+      const res = await axiosInstance.get(`/admin/Projects`);
+      return res.data.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to fetch Projects");
+      return thunkAPI.rejectWithValue(error.response?.data?.message);
+    }
+  },
+);
+
 const adminSlice = createSlice({
   name: "admin",
   initialState: {
@@ -130,6 +143,11 @@ const adminSlice = createSlice({
       .addCase(getAllUsers.fulfilled, (state, action) => {
         state.users = action.payload.users;
       })
+
+       .addCase(getAllProjects.fulfilled, (state, action) => {
+        state.Projects = action.payload.Projects;
+      })
+
       .addCase(createTeacher.fulfilled, (state, action) => {
         if (state.users) state.users.unshift(action.payload);
       })

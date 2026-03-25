@@ -65,6 +65,7 @@ export const requestSupervisors = createAsyncThunk(
     try {
       const res = await axiosInstance.post("/student/request-supervisor", data);
       thunkAPI.dispatch(getSupervisor());
+      toast.success(res.data.message)
       return res.data.data?.request;
     } catch (error) {
       toast.error(
@@ -99,6 +100,51 @@ export const uploadFiles = createAsyncThunk(
   },
 );
 
+export const fetchDashboardStats = createAsyncThunk(
+  "fetchDashboardStats",
+  async(_,thunkAPI) =>{
+    try{
+      const res = await axiosInstance.get("/student/fetch-dashboard-stats");
+      return res.data.data || res.data;
+    }catch (error){
+      toast.error(error.response.data.message || "Failed to student fetch dashboard stats");
+      return thunkAPI.rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
+export const getFeedback = createAsyncThunk(
+  "getFeedback",
+  async(projectId,thunkAPI) =>{
+    try{
+      const res = await axiosInstance.get(`/student/feedback/:${projectId}`);
+      return res.data.data?.feedback || res.data.data ||res.data;
+    }catch (error){
+      toast.error(error.response.data.message ||
+         "Failed to fetch feedback ");
+      return thunkAPI.rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
+export const downloadFile = createAsyncThunk(
+  "downloadfile",
+  async({ projectId , fileId}, thunkAPI) => {
+    try{
+     const res = await axiosInstance.get(
+      `/student/download/${projectId}/${fileId}`,
+      {
+        responseType:"blob",
+      }
+     );
+     return { blob : res.data,projectId,fileId};
+    } catch (error) {
+    toast.error(error.response?.data?.message || "Failed to download file");
+    return thunkAPI.rejectWithValue(error.response?.data?.message)
+    }
+  }
+);
+
 const studentSlice = createSlice({
   name: "student",
   initialState: {
@@ -111,7 +157,8 @@ const studentSlice = createSlice({
     feedback: [],
     status: null,
   },
-  reducers: {},
+});
+  reducers: {}
   extraReducers: (builder) => {
     builder.addCase(submitProjectProposal.fulfilled, (state, action) => {
       state.project = action.payload?.project || action.payload;
@@ -119,6 +166,7 @@ const studentSlice = createSlice({
 
     builder.addCase(fetchProject.fulfilled, (state, action) => {
       state.project = action.payload?.project || action.payload || null;
+      state.files = action.payload?.files || []
     });
 
     builder.addCase(getSupervisor.fulfilled, (state, action) => {
@@ -133,7 +181,12 @@ const studentSlice = createSlice({
       const newFiles = action.payload?.project?.files || action.payload ||[];
       state.files = [...state.files, ...newFiles];
     });
-  },
-});
+    builder.addCase(getFeedback.fulfilled, (state, action) => {
+      state.feedback = action.payload ||[];
+    });
+    builder.addCase(fetchDashboardStats.fulfilled, (state, action) => {
+      state.dashboardStats = action.payload ||[];
+    });
+  }
 
 export default studentSlice.reducer;

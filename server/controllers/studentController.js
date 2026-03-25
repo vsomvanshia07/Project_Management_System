@@ -7,6 +7,7 @@ import * as requestServices from "../services/requestServices.js";
 import * as notificationServices from "../services/notificationServices.js";
 import { Project } from "../models/project.js";
 import { Notification } from "../models/notification.js";
+import * as fileServices from "../services/fileServices.js";
 
 export const getStudentProject = asyncHandler(async (req, res, next) => {
   const studentId = req.user._id;
@@ -41,6 +42,11 @@ export const submitProposal = asyncHandler(async (req, res, next) => {
     );
   }
 
+  if(existingProject && existingProject.status === "rejected"){
+    await Project.findByIdAndDelete(existingProject._id);
+
+  }
+
   const projectData = {
     student: studentId,
     title,
@@ -62,7 +68,10 @@ export const uploadFiles = asyncHandler(async (req, res, next) => {
   const studentId = req.user._id;
   const project = await projectService.getProjectById(projectId);
 
-  if (!project || project.student.toString() !== studentId.toString()) {
+  console.log(project);
+  console.log(studentId);
+
+  if (!project || project.student._id.toString() !== studentId.toString()) {
     return next(
       new ErrorHandler("Not authorized to upload files to this project", 403),
     );
@@ -71,7 +80,8 @@ export const uploadFiles = asyncHandler(async (req, res, next) => {
   if (!req.files || req.files.length === 0) {
     return next(new ErrorHandler("No files uploaded", 400));
   }
-
+  console.log("line 82")
+  console.log(req.files)
   const updatedProject = await projectService.addFilesToProject(
     projectId,
     req.files,
@@ -212,4 +222,41 @@ export const getDashboardStats = asyncHandler(async (req, res, next) => {
       supervisorName,
     },
   });
+});
+
+export const getFeedback = asyncHandler(async(req ,res,next)=>{
+  const { projectId } =req.params;
+  const studentId =req.user._id;
+
+  const project = await projectService.getProjectById(projectId);
+
+  if(! project || project.student.toString() !==studentId.toString()){
+    return next(new ErrorHandler("Not authorized to view feedback for this project",403));
+  }
+  
+  const sortedFeedback = project.feedback.sort(
+    (a,b) => new Date(b.createAt) - new Date(a.createAt)
+  );
+
+   res.status(200).json({
+    success: true,
+    data :{
+      feedback:sortedFeedback
+    },
+   });
+});
+
+export const downloadFile = asyncHandler(async (req,res,next) =>{
+  const {projectId,fileId }= req.params;
+  const studentId = req.user._id;
+
+  const project =await projectServices.getProjectById(projectId);
+  if(!project) return next(new ErrorHandler("Project not found",404));
+  if(project.student._id.toString() != studentId.toString()){
+    return next(new ErrorHandler("Not authorized to download file",403));
+  }
+  const file =project.file.id(fileId);
+   if(!project) return next(new ErrorHandler("Project not found",404));
+
+  fileServices.streamDownload(file.fileUrl,res,file.originalName);
 });
