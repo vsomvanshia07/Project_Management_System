@@ -1,6 +1,8 @@
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import ErrorHandler from "../middlewares/error.js";
 import { User } from "../models/user.js";
+import { Project } from "../models/project.js";
+import { SupervisorRequest } from "../models/supervisorRequest.js";
 import * as userServices from "../services/userService.js";
 import * as projectServices from "../services/projectServices.js";
 
@@ -85,7 +87,7 @@ export const createTeacher = asyncHandler(async (req, res, next) => {
 export const updateTeacher = asyncHandler(async (req, res, next) => {
   const { id } = req.param;
   const updateData = { ...req.body };
-  delete updateData.role; //Prevent role update
+  delete updateData.role;     //Prevent role update
 
   const user = await userServices.updateUser(id, updateData);
   if (!user) {
@@ -124,17 +126,46 @@ export const getAllUsers = asyncHandler(async (req, res, next) => {
   });
 });
 
-
 export const getAllProjects= asyncHandler(async (req, res, next) => {
   const projects= await projectServices.getAllProjects();
   console.log(projects)
   res.json({
     success:true,
     message:"Project fetched successfully",
-    data:{ project},
+    data:{project},
   });
 });
 
-export const assignSupervisor = asyncHandler(async (req, res, next) => {});
+export const assignSupervisor = asyncHandler(async (req, res, next) => {const [
+    totalStudents,
+    totalTeachers,
+    totalProjects,
+    pendingRequests,
+    completedprojects,
+    pendingProjects,
+  ] = await Promise.all([
+    User.countDocuments({role: "Student"}),
+    User.countDocuments({role: "Teacher"}),
+    Project.countDocuments(),
+    SupervisorRequest.countDocuments({status: "pending"}),
+    Project.countDocuments({status: "completed"}),
+    Project.countDocuments({status: "pending"}),
+  ])
+
+  res.status(200).json({
+    success :true,
+    message:"Admin Dashboard Stats Fetched",
+    data:{
+      stats: {
+    totalStudents,
+    totalTeachers,
+    totalProjects,
+    pendingRequests,
+    completedprojects,
+    pendingProjects,
+      },
+    },
+  });
+});
 
 export const getDashboardStats = asyncHandler(async (req, res, next) => {});

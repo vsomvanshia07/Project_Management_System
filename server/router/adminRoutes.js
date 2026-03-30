@@ -6,6 +6,7 @@ import {
   deleteTeacher,
   getAllProjects,
   getAllUsers,
+  getDashboardStats,
   updateStudent,
   updateTeacher,
 } from "../controllers/admincontroller.js";
@@ -58,6 +59,13 @@ router.get(
   isAuthenticated,
   isAuthorized("Admin"),
   getAllProjects
+);
+
+router.get(
+  "/fetch-dashboard-stats",
+  isAuthenticated,
+  isAuthorized("Admin"),
+  getDashboardStats
 );
 
 router.get("/users", isAuthenticated, isAuthorized("Admin"), getAllUsers);

@@ -49,12 +49,12 @@ const formatDate = (dateStr)=>{
   return <>
   <div className="space-y-6">
     <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
-      <h1 className="text -2xl font-bold md-2">
-         Welcome back,{authUser?.name || "student"}
-         </h1>
-         <p className="text-blue-100">
+      <h1 className="text-2xl font-bold md-2">
+        Welcome back,{authUser?.name || "student"}
+        </h1>
+        <p className="text-blue-100">
           Here's your project overview and recent updates.
-         </p>
+        </p>
     </div>
     {/* Quick stats */}
 
@@ -170,7 +170,7 @@ const formatDate = (dateStr)=>{
 
             <div>
         
-             <label className="text-sm-font-medium
+            <label className="text-sm-font-medium
               text-slate-600">
                 Submission  Deadline
                 </label>
@@ -189,9 +189,9 @@ const formatDate = (dateStr)=>{
         justify-between">
           <h2 className="card-title">Latest Feedback</h2>
           <Link to={"/student/feedback"}
-           className="text-sm bg-blue-500 text-white px-3
-           py-1 rounded-full font-medium hover:bg-blue-600
-           transition-all duration-300">
+          className="text-sm bg-blue-500 text-white px-3
+          py-1 rounded-full font-medium hover:bg-blue-600
+          transition-all duration-300">
           view All
           
           </Link>
@@ -216,8 +216,8 @@ const formatDate = (dateStr)=>{
 
                               <h3 className ="font-medium
                               text-slate-800">
-                                {feedback.title || "Supervisor
-                              Feedback"}
+                                {feedback.title || "Supervisor"
+                              Feedback}
                               </h3>
                             </div>
                             <p className="text-xs text-slate-500">
@@ -233,7 +233,7 @@ const formatDate = (dateStr)=>{
                             </p>
                         </div>
                         <div className="flex justify-between
-                        item-center mt-3"> 
+                        item-center mt-3">
                         <p className="text-xs text-slate-500">
                         - {supervisorName || "supervisor"}
                         </p>

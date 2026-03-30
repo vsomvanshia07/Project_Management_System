@@ -16,7 +16,8 @@ import {
    User,
    AlertCircle,
    Clock,
-   CheckCircle2
+   CheckCircle2,
+   BellOff,
 } from "lucide-react";
 const NotificationsPage = () => {
 
@@ -233,24 +234,58 @@ const NotificationsPage = () => {
                           <span className="text-sm text-slate-500">
                             {formatDate(notification.createdAt)}
                           </span>
-                          <span className={`badge capitalize ${not}`}></span>
+                          <span className={`badge capitalize ${notification.type === "feedback"
+                          ?"bg-blue-100 text-blue-800"
+                          :notification.type === "deadline"
+                          ? "bg-read-100 text-red-800"
+                          :notification.type === "approval"
+                          ?"bg-green-100 text-green-800"
+                          :notification.type === "meeting"
+                          ?"bg-purple-100 text-purple-800"
+                          :"bg-grey-100 text-grey-800"
+                          }`}
+                        >
+                          {notification.type }
+                          </span>
+
+                          <div className ="flex items-center space-x-2">
+                            {!notification.isRead && (
+                              <button 
+                              className="text-sm text-blue-600 hover:text-blue-500"
+                              onClick={()=>
+                                markAsReadHandler(notification._id)
+                              }
+                              >
+                              Mark as read
+                              </button>
+                            )}
+                            <button className="text-sm text-red-600 hover:text-red-500"
+                              onClick={()=>
+                                deleteNotificationHandler(notification._id)
+                              }
+                            >
+                              Delete
+                            </button>
+                          </div>
+
                          </div>
 
                     </div>
                     
                    </div>
-
-
                  </div>
                  </div>
            );
-
           })}
       </div>
-
-
-
-
+      {notifications.length === 0 &&(
+        <div className= "text-center py-8">
+          <div className="flex items-center justify-center mb-3 text-slate-600">
+          <BellOff className = "w-12 h-12"/>
+          </div>
+          <p className="text-slate-500">No Notification yet</p>
+        </div>
+      )}
     </div>
   </div>
   </>;

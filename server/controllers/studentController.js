@@ -68,9 +68,6 @@ export const uploadFiles = asyncHandler(async (req, res, next) => {
   const studentId = req.user._id;
   const project = await projectService.getProjectById(projectId);
 
-  console.log(project);
-  console.log(studentId);
-
   if (!project || project.student._id.toString() !== studentId.toString()) {
     return next(
       new ErrorHandler("Not authorized to upload files to this project", 403),
@@ -230,13 +227,22 @@ export const getFeedback = asyncHandler(async(req ,res,next)=>{
 
   const project = await projectService.getProjectById(projectId);
 
-  if(! project || project.student.toString() !==studentId.toString()){
+  if(! project || project.student._id.toString() !==studentId.toString()){
     return next(new ErrorHandler("Not authorized to view feedback for this project",403));
   }
   
   const sortedFeedback = project.feedback.sort(
     (a,b) => new Date(b.createAt) - new Date(a.createAt)
-  );
+  ).map((f)=> ({
+    _id:f._id,
+    title: f.title,
+    message:f.message,
+    type:f.type,
+    createdAt: f.createdAt,
+    supervisorName: f.supervisorId?.name,
+    supervisorEmail: f.supervisorId?.email,
+
+  }))
 
    res.status(200).json({
     success: true,
